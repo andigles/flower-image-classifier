@@ -1,8 +1,38 @@
 # Flower Image Classifier (Udacity AIPND)
 
-Command-line (CLI) app to train an image classifier on the **Udacity Flowers** dataset and run predictions on new images.
+Command-line (CLI) app to **train** an image classifier on the **Udacity Flowers** dataset and **predict** a flower name from a new image using **transfer learning**.
 
-This repo is designed to be **runnable on a fresh machine**: clone → install → train → predict.
+**TL;DR (try this first):**
+
+- Train a checkpoint in ~1–5 minutes: `python train.py flowers --epochs 2`
+- Predict a label from an image: `python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5`
+- Uses a pretrained backbone (default: **ResNet-50**) + a new classifier head.
+
+---
+
+## Demo (what you should see)
+
+After training, run:
+
+```bash
+python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5
+```
+
+Example output (format may vary slightly):
+
+```text
+Path to image: flowers/test/3/image_06634.jpg
+Path to checkpoint: save_directory/checkpoint.pth
+Number of top K classes: 5
+Path to category names file: cat_to_name.json
+GPU: False
+
+Prediction (name): cape flower
+Probability: 0.10262521356344223
+
+Top classes (names): ['cape flower', 'cyclamen', 'lotus lotus', 'magnolia', 'columbine']
+Top probabilites: [0.10262521356344223, 0.07787298411130905, 0.05228663235902786, 0.048569660633802414, 0.0458136685192585]
+```
 
 ---
 
@@ -13,15 +43,29 @@ This repo is designed to be **runnable on a fresh machine**: clone → install �
 - `helper.py` — training / preprocessing / checkpoint helpers
 - `get_input_args.py` — CLI argument definitions
 - `cat_to_name.json` — mapping from class id → flower name
-- `assets/` — example images (optional)
+- `assets/` — screenshots / example images (optional)
+- `notebooks/` — project notebook (reference / exploration)
 
-> The dataset (`flowers/`) is **not included** and is ignored by git.
+**Not included:** the dataset folder `flowers/` (it is ignored by git).
 
 ---
 
-## Setup
+## Approach
 
-### Option A (recommended): pip + virtual environment
+This project uses **transfer learning**:
+
+1. Load a pretrained convolutional neural network (CNN) backbone (default: **ResNet-50**).
+2. Replace the final classification layer with a new **fully-connected classifier head** for 102 flower classes.
+3. Freeze (or mostly freeze) backbone parameters and train the classifier head on the flowers dataset.
+4. Save a checkpoint so you can run fast predictions later without retraining.
+
+---
+
+## Quickstart (CPU) — clone → run in 5 minutes
+
+### 1) Create an environment + install
+
+#### Option A (recommended): pip + virtual environment
 
 ```bash
 python -m venv .venv
@@ -36,74 +80,51 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Option B: Conda
+#### Option B: Conda
 
 ```bash
-conda create -n flower_image_classifier python=3.10 -y
+conda create -n flower_image_classifier python=3.11 -y
 conda activate flower_image_classifier
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
----
+### 2) Dataset layout (expected)
 
-## Dataset layout (expected)
+Place the **Udacity Flowers** dataset in the repo root:
 
-Download the **Udacity Flowers dataset** and place it in the repo root as:
-
-```bash
+```text
 flowers/
   train/
   valid/
   test/
 ```
 
-Example (paths used by the CLI):
+### 3) Train (creates a checkpoint)
 
-- training data: `flowers/train/`
-- validation data: `flowers/valid/`
-- test data: `flowers/test/`
-
-> `flowers/` is ignored by `.gitignore`, so it will not be committed.
-
----
-
-## Quickstart (CPU)
-
-### 1) Train (creates a checkpoint)
-
-This command trains for 1 epoch and saves a checkpoint into the default folder:
+Minimal training run (1 epoch):
 
 ```bash
-python train.py flowers --epochs 1
+python train.py flowers --epochs 2
 ```
 
-Default checkpoint output folder:
+Defaults:
 
-- `save_directory/`
+- checkpoint folder: `save_directory/`
+- checkpoint file: `save_directory/checkpoint.pth`
+- architecture: `resnet50`
 
-Typical checkpoint file created:
-
-- `save_directory/checkpoint.pth`
-
-You can change where checkpoints go with `--save_dir`, for example:
+A “more realistic” training example:
 
 ```bash
-python train.py flowers --epochs 3 --save_dir checkpoints/
+python train.py flowers   --arch resnet50   --learning_rate 0.003   --hidden_units 512 256   --dropout 0.2   --epochs 3
 ```
 
-### 2) Predict (top-5 classes)
-
-Use the checkpoint produced by training:
+### 4) Predict (top-5)
 
 ```bash
 python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5
 ```
-
-The output prints:
-
-- predicted flower name + probability
-- top-*k* class names + probabilities
 
 ---
 
@@ -113,22 +134,36 @@ If you have a CUDA-capable GPU and a compatible PyTorch install, add `--gpu`:
 
 ```bash
 python train.py flowers --epochs 3 --gpu
-python predict.py <image_path> save_directory/checkpoint.pth --top_k 5 --gpu
+python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5 --gpu
 ```
 
-If no GPU is available, the code will run on CPU.
+If no GPU is available, the code runs on CPU.
+
+---
+
+## Results
+
+| Setting | Value |
+| --- | --- |
+| Backbone | ResNet-50 (default) |
+| Epochs | 5 |
+| Learning rate | 0.0005 |
+| Hidden units | 512 |
+| Dropout | 0.2 |
+| Validation accuracy | 0.893 |
+| Test accuracy (optional) | 0.878 |
 
 ---
 
 ## CLI reference
 
-### Training
+### Training help
 
 ```bash
 python train.py -h
 ```
 
-Key arguments:
+Common arguments:
 
 - `data_dir` (positional): dataset folder (e.g. `flowers`)
 - `--save_dir`: folder where checkpoints are saved (default: `save_directory/`)
@@ -139,43 +174,19 @@ Key arguments:
 - `--epochs`
 - `--gpu`
 
-### Prediction
+### Prediction help
 
 ```bash
 python predict.py -h
 ```
 
-Key arguments:
+Common arguments:
 
 - `path_to_image` (positional)
 - `path_to_checkpoint` (positional)
-- `--top_k` (default shown by `-h`)
+- `--top_k`
 - `--category_names` (default: `cat_to_name.json`)
 - `--gpu`
-
----
-
-## Notes
-
-- **Checkpoints are not committed.** They are ignored by `.gitignore` (including `*.pth` and the `save_directory/` output folder).
-- **Image preprocessing:** images are converted to RGB during preprocessing so `.png` images with transparency (RGBA) work reliably.
-- You may see torchvision warnings about `pretrained` being deprecated. These are harmless and do not affect runtime.
-
----
-
-## Troubleshooting
-
-### “Parent directory save_directory does not exist”
-
-Create the folder or use a different `--save_dir`. The code should also auto-create it when saving:
-
-```bash
-mkdir save_directory
-```
-
-### “Weights only load failed” (PyTorch 2.6+)
-
-Newer PyTorch versions changed default loading behavior. The code should load trusted checkpoints correctly. If you hit this, ensure you are using the latest code in this repo.
 
 ---
 
