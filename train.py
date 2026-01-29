@@ -24,7 +24,7 @@ import helper
 
 
 # Imports functions created for this program
-from get_input_args import get_train_args, get_predict_args
+from get_input_args import get_train_args
 
 # Main program function defined below
 def main():
