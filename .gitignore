@@ -216,3 +216,6 @@ checkpoint*.pth
 
 # Directories
 save_directory/
+
+# Various
+TREE.txt
