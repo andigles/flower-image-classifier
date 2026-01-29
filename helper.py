@@ -355,23 +355,20 @@ def saving_model(
     Returns:
     None
     """
-    # Get the name of the last layer of the model (Classfier)
-    last_layer_name = list(trained_model._modules.keys())[-1]
-    classifier = getattr(trained_model, last_layer_name)
 
     # Saving the model
     checkpoint = {
         "class_to_idx": class_to_idx,
         "state_dict": trained_model.state_dict(),
-        "classifier": classifier,
         "optimizer_state_dict": optimizer_state_dict,
         "architecture": arch,
         "learning_rate": learning_rate,
         "hidden_units": hidden_units,
         "dropout": dropout,
         "epochs": epochs,
+        "output_size": 102,
     }
-
+    
     base_filename = "checkpoint"
     extension = ".pth"
     i = 0
@@ -429,9 +426,29 @@ def load_checkpoint(path_to_checkpoint):
 
     # Get the last layer name and in_features values
     last_layer_name = list(checkpoint_model._modules.keys())[-1]
+    last_layer = getattr(checkpoint_model, last_layer_name)
 
-    # Replace last layer with our classifier
-    checkpoint_model._modules[last_layer_name] = checkpoint["classifier"]
+    if isinstance(last_layer, nn.Sequential):
+        first_linear = [m for m in last_layer.modules() if isinstance(m, nn.Linear)][0]
+        last_layer_in_features = first_linear.in_features
+    else:
+        last_layer_in_features = last_layer.in_features
+
+    # Backward compatible:
+    # - Old checkpoints store the classifier object
+    # - New checkpoints rebuild classifier from hyperparameters
+    if "classifier" in checkpoint:
+        checkpoint_model._modules[last_layer_name] = checkpoint["classifier"]
+    else:
+        output_size = checkpoint.get("output_size", 102)
+        classifier = create_classifier(
+            last_layer_in_features,
+            output_size,
+            checkpoint["hidden_units"],
+            checkpoint["dropout"],
+        )
+        checkpoint_model._modules[last_layer_name] = classifier
+
     classifier = getattr(checkpoint_model, last_layer_name)
 
     checkpoint_model.class_to_idx = checkpoint["class_to_idx"]
