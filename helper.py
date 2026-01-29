@@ -388,9 +388,19 @@ def load_checkpoint(path_to_checkpoint):
     optimizer (torch.optim.adam.Adam): Optimizer object as per trained in checkpoint
     """
     # Load checkpoint
-    checkpoint = torch.load(
-        path_to_checkpoint, map_location=lambda storage, loc: storage
-    )
+    try:
+        checkpoint = torch.load(
+            path_to_checkpoint,
+            map_location=lambda storage, loc: storage,
+            weights_only=False,
+        )
+    except TypeError:
+        # Older PyTorch: no weights_only argument
+        checkpoint = torch.load(
+            path_to_checkpoint,
+            map_location=lambda storage, loc: storage,
+        )
+
 
     # Rebuilding the model
     checkpoint_model = getattr(models, checkpoint["architecture"])(pretrained=True)
