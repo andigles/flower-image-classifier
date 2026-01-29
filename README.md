@@ -4,7 +4,8 @@ Command-line (CLI) app to **train** an image classifier on the **Udacity Flowers
 
 **TL;DR (try this first):**
 
-- Train a checkpoint in ~1–5 minutes: `python train.py flowers --epochs 2`
+- **No-training quickstart (recommended):** download a pretrained checkpoint from **GitHub Releases** and run `predict.py`.
+- Train your own checkpoint (CPU-only can be slow): `python train.py flowers --epochs 2`
 - Predict a label from an image: `python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5`
 - Uses a pretrained backbone (default: **ResNet-50**) + a new classifier head.
 
@@ -68,7 +69,7 @@ This project uses **transfer learning**:
 
 ---
 
-## Quickstart (CPU) — clone → run in 5 minutes
+## Quickstart — clone → predict (no training)
 
 ### 1) Create an environment + install
 
@@ -107,9 +108,25 @@ flowers/
   test/
 ```
 
-### 3) Train (creates a checkpoint)
+### 3) Download the pretrained checkpoint (recommended)
 
-Minimal training run (1 epoch):
+Download `checkpoint.pth` from the repo’s **GitHub Release** (e.g. `v1.0.0`) and save it to:
+
+```text
+save_directory/checkpoint.pth
+```
+
+Now you can run predictions **without training**:
+
+```bash
+python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5
+```
+
+If you don’t have the dataset locally (`flowers/`), use any local image path instead of `flowers/test/...`.
+
+### 4) Train (optional — creates your own checkpoint)
+
+Minimal training run (2 epochs):
 
 ```bash
 python train.py flowers --epochs 2
@@ -127,7 +144,7 @@ A “more realistic” training example:
 python train.py flowers   --arch resnet50   --learning_rate 0.003   --hidden_units 512 256   --dropout 0.2   --epochs 3
 ```
 
-### 4) Predict (top-5)
+### 5) Predict (top-5)
 
 ```bash
 python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5
@@ -157,7 +174,7 @@ If no GPU is available, the code runs on CPU.
 | Learning rate | 0.0005 |
 | Hidden units | 512 |
 | Dropout | 0.2 |
-| Validation accuracy | 0.893 |
+| Validation accuracy | 0.920 |
 | Test accuracy (optional) | 0.878 |
 
 ---
