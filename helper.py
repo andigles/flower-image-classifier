@@ -22,6 +22,13 @@ from torch.utils.data import DataLoader
 from collections import OrderedDict
 from PIL import Image
 
+try:
+    # torchvision >= 0.13
+    from torchvision.models import get_model, get_model_weights
+except ImportError:
+    get_model = None
+    get_model_weights = None
+
 
 def data_batching(data_dir):
     """
@@ -90,7 +97,6 @@ def data_batching(data_dir):
 
     return trainloader, validloader, testloader, class_to_idx
 
-
 def building_model(model_arch, hidden_units, dropout):
     """
     Function for building the complete model based on a pretrained model and a
@@ -107,7 +113,14 @@ def building_model(model_arch, hidden_units, dropout):
     """
 
     # Pretrained Network
-    model = getattr(models, model_arch)(pretrained=True)
+    if get_model is not None and get_model_weights is not None:
+        # Use the modern weights API (no deprecation warnings)
+        weights_enum = get_model_weights(model_arch)
+        weights = weights_enum.DEFAULT  # pretrained weights
+        model = get_model(model_arch, weights=weights)
+    else:
+        # Fallback for older torchvision (may warn)
+        model = getattr(models, model_arch)(pretrained=True)
 
     # Freeze parameters in pre-trained model
     for param in model.parameters():
@@ -401,9 +414,15 @@ def load_checkpoint(path_to_checkpoint):
             map_location=lambda storage, loc: storage,
         )
 
+    arch = checkpoint["architecture"]
 
-    # Rebuilding the model
-    checkpoint_model = getattr(models, checkpoint["architecture"])(pretrained=True)
+    if get_model is not None and get_model_weights is not None:
+        weights_enum = get_model_weights(arch)
+        weights = weights_enum.DEFAULT
+        checkpoint_model = get_model(arch, weights=weights)
+    else:
+        checkpoint_model = getattr(models, arch)(pretrained=True)
+
     # Freeze parameters in pre-trained model
     for param in checkpoint_model.parameters():
         param.requires_grad = False
