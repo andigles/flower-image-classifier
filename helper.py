@@ -519,7 +519,6 @@ def process_image(path_to_image):
         x = (im_width - 224) // 2
         y = (im_height - 224) // 2
         im = im.crop((x, y, x + 224, y + 224))
-        im = im.crop((x, y, x + 224, y + 224))
 
         # Converting from int 0-255 to floats 0-1 and normalization
         np_im = np.array(im)
