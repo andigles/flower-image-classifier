@@ -213,3 +213,6 @@ flowers/
 *.pth
 *.pt
 checkpoint*.pth
+
+# Directories
+save_directory/
