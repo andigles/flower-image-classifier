@@ -177,7 +177,7 @@ def training_classifier(model, trainloader, validloader, testloader, learning_ra
     valid_losses (list): List containing validation loss of each epoch
     '''
     # Use GPU if available
-    if use_gpu == True:
+    if use_gpu:
         # If CUDA is avaiable run
         print("Trying GPU.. ")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -377,7 +377,7 @@ def predict_class(path_to_image, checkpoint_model, top_k, use_gpu):
     inputs = torch.from_numpy(np.array([im])).float()
     
     # Use GPU if available
-    if use_gpu == True:
+    if use_gpu:
         # If CUDA is avaiable run
         print("Trying GPU.. ")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
