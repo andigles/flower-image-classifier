@@ -461,7 +461,7 @@ def process_image(path_to_image):
     """Scales, crops, and normalizes a PIL image for a PyTorch model,
     returns an Numpy array
     """
-    with Image.open(path_to_image) as im:
+    with Image.open(path_to_image).convert("RGB") as im:
         # Resize with shortest side 256 (assuming format is supported)
         # im.thumbnail((256, 256))
         im_width, im_height = im.size
