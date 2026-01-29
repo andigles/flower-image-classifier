@@ -34,6 +34,12 @@ Top classes (names): ['cape flower', 'cyclamen', 'lotus lotus', 'magnolia', 'col
 Top probabilites: [0.10262521356344223, 0.07787298411130905, 0.05228663235902786, 0.048569660633802414, 0.0458136685192585]
 ```
 
+## Smoke test
+
+```bash
+python scripts/smoke_test.py
+```
+
 ---
 
 ## What’s in this repo
@@ -45,6 +51,7 @@ Top probabilites: [0.10262521356344223, 0.07787298411130905, 0.05228663235902786
 - `cat_to_name.json` — mapping from class id → flower name
 - `assets/` — screenshots / example images (optional)
 - `notebooks/` — project notebook (reference / exploration)
+- `scripts/` — script (smoke test, others.)
 
 **Not included:** the dataset folder `flowers/` (it is ignored by git).
 
