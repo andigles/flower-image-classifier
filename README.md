@@ -10,6 +10,7 @@ Command-line (CLI) app to **train** an image classifier on the **Udacity Flowers
 - Train your own checkpoint (CPU-only can be slow): `python train.py flowers --epochs 2`
 - Predict a label from an image: `python predict.py flowers/test/3/image_06634.jpg save_directory/checkpoint.pth --top_k 5`
 - Uses a pretrained backbone (default: **ResNet-50**) + a new classifier head.
+- Checkpoint integrity: compare file SHA-256 with the value in the Release notes.
 
 ---
 
@@ -34,7 +35,7 @@ Prediction (name): cape flower
 Probability: 0.10262521356344223
 
 Top classes (names): ['cape flower', 'cyclamen', 'lotus lotus', 'magnolia', 'columbine']
-Top probabilites: [0.10262521356344223, 0.07787298411130905, 0.05228663235902786, 0.048569660633802414, 0.0458136685192585]
+Top probabilities: [0.10262521356344223, 0.07787298411130905, 0.05228663235902786, 0.048569660633802414, 0.0458136685192585]
 ```
 
 ## Smoke test
@@ -169,15 +170,15 @@ If no GPU is available, the code runs on CPU.
 
 ## Results
 
-| Setting | Value |
-| --- | --- |
-| Backbone | ResNet-50 (default) |
-| Epochs | 5 |
-| Learning rate | 0.0005 |
-| Hidden units | 512 |
-| Dropout | 0.2 |
-| Validation accuracy | 0.920 |
-| Test accuracy (optional) | 0.878 |
+| Setting             | Value     |
+| ------------------- | --------- |
+| Backbone            | ResNet-50 |
+| Epochs              | 5         |
+| Learning rate       | 0.0005    |
+| Hidden units        | 512       |
+| Dropout             | 0.2       |
+| Validation accuracy | 0.920     |
+| Test accuracy       | 0.878     |
 
 ---
 
@@ -218,4 +219,4 @@ Common arguments:
 
 ## License
 
-This project is for learning/portfolio purposes. Add a license file if you plan to reuse/distribute it widely.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

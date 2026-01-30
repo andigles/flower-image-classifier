@@ -565,4 +565,4 @@ def display_class(top_ps, top_classes, category_names):
             print(f"Prediction (lable): {top_classes[0]}")
             print(f"Probability: {top_ps[0]}\n")
             print(f"Top classes (labels): {top_classes}")
-            print(f"Top probabilites: {top_ps}")
+            print(f"Top probabilities: {top_ps}")
