@@ -59,9 +59,9 @@ def get_train_args():
     )
     parser.add_argument(
         "--hidden_units",
-        nargs="*",
+        nargs="+",
         type=int,
-        default=512,
+        default=[512],
         help="Hidden units e.g. --hidden_units 512 256 64",
     )
     parser.add_argument(
@@ -114,7 +114,7 @@ def get_predict_args():
     parser.add_argument(
         "--gpu",
         action="store_true",
-        help="If activated, run training in GPU mode if available",
+        help="If activated, run inference in GPU mode if available",
     )
 
     # Replace None with parser.parse_args() parsed argument collection that

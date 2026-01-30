@@ -37,9 +37,6 @@ def main():
     # the collection of these command line arguments from the function call as
     # the variable in_arg
     in_arg = get_train_args()
-    # If hidden_units is int, convert to list
-    if isinstance(in_arg.hidden_units, int):
-        in_arg.hidden_units = [in_arg.hidden_units]
 
     # Printing set input values
     print(" ")
