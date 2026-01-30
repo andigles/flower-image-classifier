@@ -36,6 +36,12 @@ def main():
     # the collection of these command line arguments from the function call as
     # the variable in_arg
     in_arg = get_predict_args()
+
+    # Friendly input validation (no stack traces)
+    helper.validate_file(in_arg.path_to_image, "Image")
+    helper.validate_file(in_arg.path_to_checkpoint, "Checkpoint")
+    helper.validate_file(in_arg.category_names, "Category names file")
+    helper.validate_top_k(in_arg.top_k, max_k=102)
        
     # Printing set input values
     print(" ")

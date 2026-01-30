@@ -19,6 +19,7 @@
 ##
 
 # Imports python modules
+import os
 import time
 import helper
 
@@ -37,6 +38,12 @@ def main():
     # the collection of these command line arguments from the function call as
     # the variable in_arg
     in_arg = get_train_args()
+
+    # Friendly input validation (no stack traces)
+    helper.validate_dir(in_arg.data_dir, "Data directory")
+    # save_dir can be create later; but if user provided something weird like a fle path, atch it:
+    if os.path.isfile(in_arg.save_dir):
+        helper.error_exit(f"--save_dir must be a directory, got a file: {in_arg.save_dir}")
 
     # Printing set input values
     print(" ")

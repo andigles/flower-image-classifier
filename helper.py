@@ -16,6 +16,7 @@ import numpy as np
 import time
 import os
 import json
+import sys
 from torch import nn, optim
 from torchvision import transforms, datasets, models
 from torch.utils.data import DataLoader
@@ -29,6 +30,26 @@ except ImportError:
     get_model = None
     get_model_weights = None
 
+def error_exit(message, code=2):
+    """Print a freindly error and exit with a non-zero code (no stack trace)."""
+    print(f"Error: {message}", file=sys.stderr)
+    raise SystemExit(code)
+
+def validate_file(path, label):
+    if not path or not os.path.isfile(path):
+        error_exit(f"{label} not found: {path}")
+
+def validate_dir(path, label):
+    if not path or not os.path.isdir(path):
+        error_exit(f"{label} not found: {path}")
+
+def validate_top_k(top_k, max_k = 102):
+    if not isinstance(top_k, int):
+        error_exit("--top_k must be an integer")
+    if top_k <= 0:
+        error_exit("--top_k must be a positive integer")
+    if top_k > max_k:
+        error_exit(f"--top_k must be <= {max_k}")
 
 def data_batching(data_dir):
     """
