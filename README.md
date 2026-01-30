@@ -1,5 +1,7 @@
 # Flower Image Classifier (Udacity AIPND)
 
+[![CI](https://github.com/andigles/flower-image-classifier/actions/workflows/ci.yml/badge.svg)](https://github.com/andigles/flower-image-classifier/actions/workflows/ci.yml)
+
 Command-line (CLI) app to **train** an image classifier on the **Udacity Flowers** dataset and **predict** a flower name from a new image using **transfer learning**.
 
 **TL;DR (try this first):**
