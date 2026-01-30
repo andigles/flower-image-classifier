@@ -51,6 +51,14 @@ def validate_top_k(top_k, max_k = 102):
     if top_k > max_k:
         error_exit(f"--top_k must be <= {max_k}")
 
+def get_device(gpu_requested):
+    """Return torch.device and print a single friendly note if GPU was requested but unavailable."""
+    if gpu_requested:
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        print("GPU requested but not available; using CPU.")
+    return torch.device("cpu")
+
 def data_batching(data_dir):
     """
     Function for getting loaders for train, validation and testing data from data_dir.
@@ -406,7 +414,7 @@ def saving_model(
     return None
 
 
-def load_checkpoint(path_to_checkpoint):
+def load_checkpoint(path_to_checkpoint, device=None):
     """
     Function for loading and rebuilding a model from a checkpoint file.
 
@@ -419,20 +427,20 @@ def load_checkpoint(path_to_checkpoint):
     optimizer (torch.optim.adam.Adam): Optimizer object as per trained in checkpoint
     """
     # Load checkpoint
+    if device is None:
+        device = torch.device("cpu")
     try:
-        checkpoint = torch.load(
-            path_to_checkpoint,
-            map_location=lambda storage, loc: storage,
-            weights_only=False,
-        )
+        checkpoint = torch.load(path_to_checkpoint, map_location=device, weights_only=False)
     except TypeError:
-        # Older PyTorch: no weights_only argument
-        checkpoint = torch.load(
-            path_to_checkpoint,
-            map_location=lambda storage, loc: storage,
-        )
+        checkpoint = torch.load(path_to_checkpoint, map_location=device)
 
-    arch = checkpoint["architecture"]
+    # Friendly compatibility check
+    required = ["architecture", "state_dict", "class_to_idx", "learning_rate", "optimizer_state_dict"]
+    missing = [k for k in required if k not in checkpoint]
+    if missing:
+        error_exit(f"Checkpoint is not compatible with this script (missing keys: {missing})")
+
+    arch = checkpoint["architecture"]       
 
     if get_model is not None and get_model_weights is not None:
         weights_enum = get_model_weights(arch)
@@ -480,27 +488,14 @@ def load_checkpoint(path_to_checkpoint):
     return checkpoint_model, optimizer
 
 
-def predict_class(path_to_image, checkpoint_model, top_k, use_gpu):
+def predict_class(path_to_image, checkpoint_model, top_k, device):
     """Predict the class (or classes) of an image using a trained deep learning model."""
     im = process_image(path_to_image)
     inputs = torch.from_numpy(np.array([im])).float()
 
-    # Use GPU if available
-    if use_gpu:
-        # If CUDA is avaiable run
-        print("Trying GPU.. ")
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        if device == torch.device("cpu"):
-            print("GPU is not availabe")
-        else:
-            print("Running in GPU.")
-    else:
-        device = "cpu"
-
-    inputs = inputs.to(device)
     checkpoint_model.to(device)
-
+    inputs = inputs.to(device)
+    
     with torch.no_grad():
         checkpoint_model.eval()
         logps = checkpoint_model.forward(inputs)

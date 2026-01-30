@@ -54,12 +54,13 @@ def main():
     # Function for loading and rebuilding a model from a checkpoint file.
     # This function returns a tuple containing the model rebuilt from checkpoint file and
     # the optimizer object with their state_dict() loaded.
-    checkpoint_model, optimizer = helper.load_checkpoint(in_arg.path_to_checkpoint)
+    device = helper.get_device(in_arg.gpu)
+    checkpoint_model, optimizer = helper.load_checkpoint(in_arg.path_to_checkpoint, device = device)
     
     # Function for predicting the top_k classes of an image.
     # This function returns the top_k probabilities and its corresponding top classes
     # In two separate lists
-    top_ps, top_classes = helper.predict_class(in_arg.path_to_image, checkpoint_model, in_arg.top_k, in_arg.gpu)
+    top_ps, top_classes = helper.predict_class(in_arg.path_to_image, checkpoint_model, in_arg.top_k, device)
     
     # Function for predicting the top_k classes of an image.
     # This function returns the top_k probabilities and its corresponding top classes
