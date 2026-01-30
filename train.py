@@ -46,15 +46,18 @@ def main():
         helper.error_exit(f"--save_dir must be a directory, got a file: {in_arg.save_dir}")
 
     # Printing set input values
-    print(" ")
-    print(f"Data directory: {in_arg.data_dir}")
-    print(f"Checkpoint directory: {in_arg.save_dir}")
-    print(f"Pretrained model architecture: {in_arg.arch}")
-    print(f"Learning rate: {in_arg.learning_rate}")
-    print(f"hidden_units: {in_arg.hidden_units}")
-    print(f"Dropout: {in_arg.dropout}")
-    print(f"Epochs: {in_arg.epochs}")
-    print(f"GPU: {in_arg.gpu}\n")
+    device = helper.get_device(in_arg.gpu)
+    print("")
+    print("Train")
+    print(f"    Data dir:   {in_arg.data_dir}")
+    print(f"    Save dir:   {in_arg.save_dir}")
+    print(f"    Arch:       {in_arg.arch}")
+    print(f"    LR:         {in_arg.learning_rate}")
+    print(f"    Hidden:     {in_arg.hidden_units}")
+    print(f"    Dropout:    {in_arg.dropout}")
+    print(f"    Epochs:     {in_arg.epochs}")
+    print(f"    Device:     {device}")
+    print("")
 
     # Function for getting loaders for train, validation and testing data from data_dir.
     # This function returns a tuple containing the DataLoader objects for the training,
@@ -79,7 +82,7 @@ def main():
         testloader,
         in_arg.learning_rate,
         in_arg.epochs,
-        in_arg.gpu,
+        device,
     )
 
     # Function for saving trained model and hyperparameters in spedified save_dir folder.

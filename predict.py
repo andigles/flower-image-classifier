@@ -44,17 +44,20 @@ def main():
     helper.validate_top_k(in_arg.top_k, max_k=102)
        
     # Printing set input values
-    print(" ")
-    print(f"Path to image: {in_arg.path_to_image}")
-    print(f"Path to checkpoint: {in_arg.path_to_checkpoint}")
-    print(f"Number of top K classes: {in_arg.top_k}")
-    print(f"Path to category names file: {in_arg.category_names}")
-    print(f"GPU: {in_arg.gpu}\n")
+    device = helper.get_device(in_arg.gpu)
+
+    print("")
+    print("Predict")
+    print(f"    Image:          {in_arg.path_to_image}")
+    print(f"    Checkpoint:     {in_arg.path_to_checkpoint}")
+    print(f"    Category names: {in_arg.category_names}")
+    print(f"    Top K:          {in_arg.top_k}")
+    print(f"    Device:         {device}")
+    print("")
     
     # Function for loading and rebuilding a model from a checkpoint file.
     # This function returns a tuple containing the model rebuilt from checkpoint file and
     # the optimizer object with their state_dict() loaded.
-    device = helper.get_device(in_arg.gpu)
     checkpoint_model, optimizer = helper.load_checkpoint(in_arg.path_to_checkpoint, device = device)
     
     # Function for predicting the top_k classes of an image.

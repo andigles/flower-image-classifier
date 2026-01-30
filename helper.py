@@ -211,7 +211,7 @@ def create_classifier(input_size, output_size, hidden_units, dropout):
 
 
 def training_classifier(
-    model, trainloader, validloader, testloader, learning_rate, epochs, use_gpu
+    model, trainloader, validloader, testloader, learning_rate, epochs, device
 ):
     """
     Function for training classifier of the model. The parameters of the pretrained
@@ -233,19 +233,7 @@ def training_classifier(
     train_losses (list): List containing train loss of each epoch
     valid_losses (list): List containing validation loss of each epoch
     """
-    # Use GPU if available
-    if use_gpu:
-        # If CUDA is avaiable run
-        print("Trying GPU.. ")
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        if device == torch.device("cpu"):
-            print("GPU is not availabe")
-        else:
-            print("Running in GPU.")
-    else:
-        device = "cpu"
-
+    
     # Model to CUDA if available
     model.to(device)
 
